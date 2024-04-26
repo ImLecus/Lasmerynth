@@ -9,10 +9,12 @@
    key:    .byte 0   # Ultima pulsacion de teclado
    pos:    .byte 2,2 # Fila, Columna actual
    goal:   .byte 1,8 # Fila, Columna de salida
+   steps:  .long 0
    # Graficos
    wall:   .asciz "#" # Pared
    nowall: .asciz " " # Espacio libre
    player: .asciz "@" # Jugador
+   exit:   .asciz "&" # Salida
    # Codigos ANSI
    position: .asciz "\033[02;02H" # Fila;Columna
    origen:   .asciz "\033[1;1H"   # Fila;Columna arriba-izquierda
@@ -23,11 +25,14 @@
    # Textos
    victory: .asciz "Has conseguido llegar a la salida.\n"
    surrend: .asciz "Te has rendido.\n"
+   argsErrMsg: .asciz "Error: no hay suficientes argumentos\n"
    # Datos del mapa
    mapfile: .long 0 # Archivo del mapa
    size: .long 9,9  # Tamaño del mapa en filas,columnas
    map: .asciz "111111101101010001101000001101110101100010101101010111100010101100000001111111111"
    FREE = '0' # Caracter que representa espacio libre
+   
+   
 
    # No TOCAR 
    termiosnew: .space 18 # Configuracion de la terminal
@@ -44,10 +49,37 @@
 # 5º Fila final
 # 6º Columna final
 _start:
-   # TODO PROCESAR ARGUMENTOS
 
+   popl %ecx
+   cmpl $6, %ecx
+   jne argsError
+   popl %ebx
+   
+   movl $5, %eax # load file
+   popl %ebx
+   movl $0, %ecx
+   int $0x80
+   movl %eax, mapfile
+   cmpl $-1, mapfile
+   je argsError
+   
+   #movl $3, %eax # read map
+   #movl mapfile, %ebx
+   #movl $map, %ecx
+   #movl $18, %edx
+   #int $0x80
+   
+   popl %edx
+   xorb $0x30, (%edx)
+   movb (%edx), %al
+   movb %al, (pos)
+   popl %edx
+   xorb $0x30, (%edx)
+   movb (%edx), %al
+   movb %al, (pos + 1)
+   SET_CURSOR_POS
+   
 
-   # TODO LEER MAPA DESDE ARCHIVO
 
 
    # Recuperar configuracion terminal
@@ -148,6 +180,10 @@ nextCol:
    # Sigue jugando
    jmp mainLoop
    
+argsError:
+	push $argsErrMsg
+	jmp end
+   
 fail:
    push $surrend
    jmp end
@@ -179,7 +215,6 @@ end:
    int $0x80
 
 
-# TODO LOGICA DE CONTROL DEL JUGADOR
 mov_up:
    decb (pos)
    SET_CURSOR_POS

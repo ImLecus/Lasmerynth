@@ -9,5 +9,4 @@ rm str_to_ul.o
 rm set_cursor_pos.o
 rm print_str.o
 rm len_str.o
-./game
-echo $?
+./game ./maps/map1.txt 2 6 1 8
