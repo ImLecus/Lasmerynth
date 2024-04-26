@@ -69,6 +69,7 @@ _start:
    #movl $18, %edx
    #int $0x80
    
+   # Posición inicial
    popl %edx
    xorb $0x30, (%edx)
    movb (%edx), %al
@@ -77,11 +78,20 @@ _start:
    xorb $0x30, (%edx)
    movb (%edx), %al
    movb %al, (pos + 1)
-   SET_CURSOR_POS
+
+   # Posición de la salida
+   popl %edx
+   xorb $0x30, (%edx)
+   movb (%edx), %al
+   movb %al, (goal)
+   popl %edx
+   xorb $0x30, (%edx)
+   movb (%edx), %al
+   movb %al, (goal + 1)
    
-
-
-
+   SET_CURSOR_POS
+	
+	
    # Recuperar configuracion terminal
    movl $54, %eax
    movl $0, %ebx
