@@ -1,9 +1,9 @@
-#------------------------------------------------------------------#
-# int set_cursor_pos(byte[] new_pos, char* cursor, char* map) 	   #
-#					   		   	   #
-# Returns 1 if the position is valid, 0    		   	   #
-# otherwise.	  			   		   	   #
-#------------------------------------------------------------------#
+#----------------------------------------------------------------------------------#
+# int set_cursor_pos(byte[] new_pos, char* cursor, char* map, int mapsize) 	   #
+#					   		   	   		   #
+# Returns 1 if the position is valid, 0    		   	   		   #
+# otherwise.	  			   		   	   		   #
+#----------------------------------------------------------------------------------#
 .type set_cursor_pos, @function
 .global set_cursor_pos
 set_cursor_pos:
@@ -13,10 +13,12 @@ set_cursor_pos:
    pushl %ecx
    pushl %esi # contador de índice
    pushl %edx # registro auxiliar
+   pushl %edi # tamaño del mapa
    # AH=fila, AL=columna
    movl 8(%ebp), %eax
    movl 12(%ebp), %ebx
    movl 16(%ebp), %ecx
+   movl 20(%ebp), %edi
    
    movl %eax, %edx
    
@@ -27,7 +29,7 @@ set_cursor_pos:
    
    countIndex:
      decb %dl
-     addl $9, %esi
+     addl %edi, %esi
      cmpb $1, %dl
      jbe countHorizontalIndex
      jmp countIndex

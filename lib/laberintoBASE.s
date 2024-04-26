@@ -1,8 +1,16 @@
 .macro SET_CURSOR_POS
+   pushl (size)
    pushl $map
    pushl $position
    pushl (pos)
    call set_cursor_pos
+.endm
+
+.macro ARGS_TO_ONE_DECIMAL target
+	popl %edx
+    xorb $0x30, (%edx)
+    movb (%edx), %al
+    movb %al, (\target)
 .endm
 
 .data
@@ -28,11 +36,11 @@
    argsErrMsg: .asciz "Error: no hay suficientes argumentos\n"
    # Datos del mapa
    mapfile: .long 0 # Archivo del mapa
-   size: .long 9,9  # Tamaño del mapa en filas,columnas
+   size: .long 10,10  # Tamaño del mapa en filas,columnas
    map: .asciz "111111101101010001101000001101110101100010101101010111100010101100000001111111111"
    FREE = '0' # Caracter que representa espacio libre
    
-   
+
 
    # No TOCAR 
    termiosnew: .space 18 # Configuracion de la terminal
@@ -41,13 +49,6 @@
 
 .text
 .global _start
-# ARGUMENTOS:
-# 1º Nombre del programa
-# 2º Archivo de mapa
-# 3º Fila inicio
-# 4º Columna inicio
-# 5º Fila final
-# 6º Columna final
 _start:
 
    popl %ecx
@@ -70,27 +71,14 @@ _start:
    int $0x80
    
    # Posición inicial
-   popl %edx
-   xorb $0x30, (%edx)
-   movb (%edx), %al
-   movb %al, (pos)
-   popl %edx
-   xorb $0x30, (%edx)
-   movb (%edx), %al
-   movb %al, (pos + 1)
+   ARGS_TO_ONE_DECIMAL pos
+   ARGS_TO_ONE_DECIMAL pos+1
 
    # Posición de la salida
-   popl %edx
-   xorb $0x30, (%edx)
-   movb (%edx), %al
-   movb %al, (goal)
-   popl %edx
-   xorb $0x30, (%edx)
-   movb (%edx), %al
-   movb %al, (goal + 1)
+   ARGS_TO_ONE_DECIMAL goal
+   ARGS_TO_ONE_DECIMAL goal+1
    
    SET_CURSOR_POS
-	
 	
    # Recuperar configuracion terminal
    movl $54, %eax
