@@ -1,3 +1,10 @@
+.macro SET_CURSOR_POS
+   pushl $map
+   pushl $position
+   pushl (pos)
+   call set_cursor_pos
+.endm
+
 .data
    key:    .byte 0   # Ultima pulsacion de teclado
    pos:    .byte 2,2 # Fila, Columna actual
@@ -173,32 +180,31 @@ end:
 
 
 # TODO LOGICA DE CONTROL DEL JUGADOR
-# TODO setCursorPos SERA SUBRUTINA, PROCESAR SALIDA
 mov_up:
    decb (pos)
-   pushl $position
-   pushl (pos)
-   call set_cursor_pos
+   SET_CURSOR_POS
+   cmpl $0, %eax
+   jz mov_down
    jmp mainLoop
 
 mov_down:
    incb (pos)
-   pushl $position
-   pushl (pos)
-   call set_cursor_pos
+   SET_CURSOR_POS
+   cmpl $0, %eax
+   jz mov_up
    jmp mainLoop
 
 mov_right:
    incb (pos+1)
-   pushl $position
-   pushl (pos)
-   call set_cursor_pos
+   SET_CURSOR_POS
+   cmpl $0, %eax
+   jz mov_left
    jmp mainLoop
 
 mov_left:
    decb (pos+1)
-   pushl $position
-   pushl (pos)
-   call set_cursor_pos
+   SET_CURSOR_POS
+   cmpl $0, %eax
+   jz mov_right
    jmp mainLoop
 
