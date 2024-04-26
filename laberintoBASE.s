@@ -63,11 +63,11 @@ _start:
    cmpl $-1, mapfile
    je argsError
    
-   #movl $3, %eax # read map
-   #movl mapfile, %ebx
-   #movl $map, %ecx
-   #movl $18, %edx
-   #int $0x80
+   movl $3, %eax # read map
+   movl mapfile, %ebx
+   movl $map, %ecx
+   movl $81, %edx
+   int $0x80
    
    # Posición inicial
    popl %edx
